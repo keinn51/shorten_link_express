@@ -35,10 +35,28 @@ function generateRandomId(length) {
   return result;
 }
 
+function getOriginalLink(newLink) {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      `SELECT * FROM shortenlink.link WHERE newLink='${newLink}' LIMIT 1`,
+      (error, results) => {
+        if (error) {
+          reject(error);
+        } else {
+          if (results.length === 0) {
+            resolve(null);
+            return;
+          }
+          resolve(results[0].originalLink);
+        }
+      }
+    );
+  });
+}
+
 // 루트 경로에 대한 핸들러
 app.get("/", (req, res) => {
-  // res.send("안녕하세요, Express 서버입니다!");
-  res.render("index.ejs");
+  res.render("index.ejs", { message: "" });
 });
 
 // 서버 시작
@@ -47,26 +65,57 @@ app.listen(port, () => {
 });
 
 // submit시 실행 함수
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
   const originalLink = req.body.originalLink;
-  const newLink = generateRandomId(6);
-  const query =
-    "INSERT INTO shortenlink.link (originalLink, newLink) VALUES (?, ?)";
-  connection.query(query, [originalLink, newLink], (error, results) => {
-    if (error) throw error;
-    res.send("쿼리문이 실행되었습니다.");
-  });
+  let newLink = generateRandomId(6);
+
+  try {
+    let preExistingNewLink = await getOriginalLink(newLink);
+    while (preExistingNewLink !== null) {
+      newLink = generateRandomId(6);
+      preExistingNewLink = await getOriginalLink(newLink);
+    }
+  } catch (err) {
+    console.error(err);
+    res.render("index.ejs", {
+      message: "서버에서 오류가 발생했습니다. 죄송합니다.",
+    });
+    return;
+  }
+
+  connection.query(
+    "INSERT INTO shortenlink.link (originalLink, newLink) VALUES (?, ?)",
+    [originalLink, newLink],
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      res.send("쿼리문이 실행되었습니다.");
+    }
+  );
 });
 
 // 리다이렉트
-app.get("/:newLink", (req, res) => {
+app.get("/:newLink", async (req, res) => {
   const newLink = req.params.newLink;
-  connection.query(
-    `SELECT * FROM shortenlink.link WHERE newLink='${newLink}' LIMIT 1`,
-    (err, rows, fields) => {
-      if (err) throw err;
-      // console.log(rows[0].originalLink);
-      res.redirect(rows[0].originalLink); // /old-url로 접속 시 /new-url로 리다이렉트
+
+  if (newLink === "404.ejs") {
+    return;
+  }
+
+  try {
+    const originalLink = await getOriginalLink(newLink);
+
+    if (originalLink === null) {
+      res.render("404.ejs");
+      return;
     }
-  );
+
+    res.redirect(originalLink);
+  } catch (err) {
+    console.error(err);
+    res.render("404.ejs");
+    return;
+  }
 });

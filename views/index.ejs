@@ -3,29 +3,117 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kyungsle Link</title>
+    <title>Bada Link</title>
+    <% if (message) { %>
     <script>
-      // function submitLink() {
-      //   const inputText = document.getElementById("linkInput").value;
-      //   alert(inputText);
-      // }
+      alert("<%= message %>");
     </script>
+    <% } %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;800&family=Noto+Sans:wght@100;400;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #232323;
+        color: snow;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 10%;
+      }
+
+      .title {
+        color: lightblue;
+      }
+
+      .form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .input {
+        padding: 5px;
+        font-family: "Noto Sans KR", sans-serif;
+        font-size: 14px;
+        box-sizing: border-box;
+        height: 40px;
+        min-width: 400px;
+        border: 3px solid lightblue;
+        background-color: #232323;
+        color: snow;
+      }
+
+      .input:focus {
+        outline: none;
+      }
+
+      .submit-button {
+        padding: 5px 10px;
+        font-size: 18px;
+        cursor: pointer;
+        background-color: lightblue;
+        border: none;
+        color: black;
+        font-family: "Noto Sans KR", sans-serif;
+        height: 40px;
+        font-weight: bold;
+        color: snow;
+      }
+
+      .title,
+      .author {
+        font-family: "Noto Sans", sans-serif;
+        text-align: center;
+      }
+
+      .author > a {
+        color: tomato;
+      }
+
+      .footer {
+        padding-bottom: 5%;
+      }
+    </style>
   </head>
   <body>
-    <div>
-      <h1>kyungsle link</h1>
+    <div class="content">
       <div>
-        <form action="/" method="POST" target="_self">
+        <h1 class="title">BADA LINK</h1>
+        <form action="/" method="POST" id="form" class="form" target="_self">
           <input
             id="linkInput"
+            class="input"
             name="originalLink"
             placeholder="링크를 입력해주세요"
             type="text"
             required
           />
-          <button type="submit">링크 제출</button>
+          <button type="submit" class="submit-button">줄이기!</button>
         </form>
       </div>
+    </div>
+    <div class="footer">
+      <h2 class="author">
+        Made By
+        <a href="https://github.com/keinn51">#Kyungsle</a>
+      </h2>
     </div>
   </body>
 </html>
