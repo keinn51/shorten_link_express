@@ -1,58 +1,19 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-require("dotenv").config();
-const mysql = require("mysql");
 const path = require("path");
 const bodyParser = require("body-parser");
+const { getOriginalLink, generateRandomId } = require("./utils/function");
+const { connection } = require("./utils/connection");
 
-const connection = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  port: process.env.MYSQL_PORT,
-  database: process.env.MYSQL_DATABASE,
-});
-
+// * 미들웨어 설정
 app.set("view engine", "ejs");
+app.set("utils", path.join(__dirname, "utils"));
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(__dirname));
-
-// 미들웨어 설정
+// ? json으로 body를 받아오기 위해 필요한 미들웨어
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-function generateRandomId(length) {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
-
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
-}
-
-function getOriginalLink(newEndPoint) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      `SELECT * FROM shortenlink.link WHERE newEndPoint='${newEndPoint}' LIMIT 1`,
-      (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          if (results.length === 0) {
-            resolve(null);
-            return;
-          }
-          resolve(results[0].originalLink);
-        }
-      }
-    );
-  });
-}
 
 function addProtocolToURL(url) {
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
