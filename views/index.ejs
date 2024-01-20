@@ -17,14 +17,13 @@
     <script>
       function handleFormSubmit(event) {
         event.preventDefault();
-        const inputValue = document.getElementById("linkInput").value;
+        const inputValue = document.getElementById("input").value;
 
-        // AJAX 요청을 보냅니다.
         fetch("/", {
           method: "POST",
           body: JSON.stringify({ originalLink: inputValue }),
           headers: {
-            "Content-Type": "application/json", // 타입 반드시 지정해줘야함..
+            "Content-Type": "application/json",
           },
         })
           .then((response) => {
@@ -37,15 +36,14 @@
             const newLink = data.newLink;
             const formBoxNode = document.getElementById("formBox");
             const newLinkNode = document.getElementById("newLink");
-            if (newLinkNode) {
-              newLinkNode.remove();
-            }
+
+            if (newLinkNode) newLinkNode.remove();
 
             const newNode = `
-              <div id="newLink" class="newLink">
+              <div id="newLink">
                 <span>
                   Hey! This is your new link:
-                  <a id="newLink" href="${newLink}" target="_blank">${newLink}</a>
+                  <a href="${newLink}" target="_blank">${newLink}</a>
                 </span>
               </div>
             `;
@@ -58,29 +56,26 @@
     </script>
   </head>
   <body>
-    <div class="content">
+    <div id="content">
       <div id="formBox">
-        <h1 class="title">BADA LINK</h1>
+        <h1 id="title">BADA LINK</h1>
         <form
           id="form"
-          class="form"
-          target="_self"
           onsubmit="handleFormSubmit(event)"
         >
           <input
-            id="linkInput"
-            class="input"
+            id="input"
             name="originalLink"
             placeholder="링크를 입력해주세요"
             type="text"
             required
           />
-          <button type="submit" class="submit-button">Shorten!</button>
+          <button id="submit-button" type="submit" >Shorten!</button>
         </form>
       </div>
     </div>
-    <div class="footer">
-      <h2 class="author">
+    <div id="footer">
+      <h2 id="author">
         Made By
         <a href="https://github.com/keinn51">#Kyungsle</a>
       </h2>

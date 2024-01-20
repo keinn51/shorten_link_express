@@ -3,7 +3,11 @@ const app = express();
 const port = 3000;
 const path = require("path");
 const bodyParser = require("body-parser");
-const { getOriginalLink, generateRandomId } = require("./utils/function");
+const {
+  getOriginalLink,
+  generateRandomId,
+  addProtocolToURL,
+} = require("./utils/function");
 const { connection } = require("./utils/connection");
 
 // * 미들웨어 설정
@@ -15,34 +19,33 @@ app.use(express.static(__dirname));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-function addProtocolToURL(url) {
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = "https://" + url;
-  }
-  return url;
-}
-
-// 루트 경로에 대한 핸들러
+// 루트 경로로 접근하면 메인 페이지 보여주기
 app.get("/", (req, res) => {
   res.render("index.ejs");
 });
 
-// 서버 시작
+// 서버 시작 시 콘솔
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
 
-// submit시 실행 함수
+// post 요청 핸들러
 app.post("/", async (req, res) => {
-  console.log(req.body, req.body.originalLink);
   let originalLink = req.body.originalLink;
   let newEndPoint = generateRandomId(6);
 
+  // original link가 빈문자열, undefined, null 등일 시에는 400 error
+  if (!originalLink) {
+    res.status(400).send();
+    return;
+  }
+
+  // 생성된 newLink가 만에 하나 기존에 있던 링크라면 다시 생성하기
   try {
-    let preExistingnewEndPoint = await getOriginalLink(newEndPoint);
-    while (preExistingnewEndPoint !== null) {
+    let preExistingNewEndPoint = await getOriginalLink(newEndPoint);
+    while (preExistingNewEndPoint !== null) {
       newEndPoint = generateRandomId(6);
-      preExistingnewEndPoint = await getOriginalLink(newEndPoint);
+      preExistingNewEndPoint = await getOriginalLink(newEndPoint);
     }
   } catch (err) {
     console.error(err);
@@ -50,8 +53,10 @@ app.post("/", async (req, res) => {
     return;
   }
 
+  // url에 프로토콜이 붙어있지 않다면 붙이기
   originalLink = addProtocolToURL(originalLink);
 
+  // row 생성 쿼리
   connection.query(
     "INSERT INTO shortenlink.link (originalLink, newEndPoint) VALUES (?, ?)",
     [originalLink, newEndPoint],
@@ -70,17 +75,14 @@ app.post("/", async (req, res) => {
   );
 });
 
-// 리다이렉트
+// 리다이렉트 코드
 app.get("/:newEndPoint", async (req, res) => {
   const newEndPoint = req.params.newEndPoint;
-
-  if (newEndPoint === "404.ejs") {
-    return;
-  }
 
   try {
     const originalLink = await getOriginalLink(newEndPoint);
 
+    // original link를 찾지 못하는 경우
     if (originalLink === null) {
       res.render("404.ejs");
       return;

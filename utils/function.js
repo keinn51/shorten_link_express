@@ -32,7 +32,15 @@ function getOriginalLink(newEndPoint) {
   });
 }
 
+function addProtocolToURL(url) {
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = "https://" + url;
+  }
+  return url;
+}
+
 module.exports = {
   generateRandomId,
   getOriginalLink,
+  addProtocolToURL,
 };
