@@ -105,12 +105,48 @@
         padding-bottom: 5%;
       }
     </style>
+
+    <script>
+      function handleFormSubmit(event) {
+        event.preventDefault();
+        const inputValue = document.getElementById("linkInput").value;
+
+        // AJAX 요청을 보냅니다.
+        fetch("/", {
+          method: "POST",
+          body: JSON.stringify({ originalLink: inputValue }),
+          headers: {
+            "Content-Type": "application/json", // 타입 반드시 지정해줘야함..
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const newLink = data.newLink;
+            const formBoxNode = document.getElementById("formBox");
+            const newNode = `
+              <div class="newLink">
+                <span>
+                  Hey! This is your new link:
+                  <a href="${newLink}">${newLink}</a>
+                </span>
+              </div>
+            `;
+            formBoxNode.insertAdjacentHTML("afterend", newNode);
+          })
+          .catch((error) => {});
+      }
+    </script>
   </head>
   <body>
     <div class="content">
-      <div>
+      <div id="formBox">
         <h1 class="title">BADA LINK</h1>
-        <form action="/" method="POST" id="form" class="form" target="_self">
+        <form
+          id="form"
+          class="form"
+          target="_self"
+          onsubmit="handleFormSubmit(event)"
+        >
           <input
             id="linkInput"
             class="input"
@@ -122,15 +158,6 @@
           <button type="submit" class="submit-button">줄이기!</button>
         </form>
       </div>
-
-      <% if (newLink) { %>
-      <div class="newLink">
-        <span>
-          Hey! This is your new link:
-          <a href="<%= newLink %>"><%= newLink %></a>
-        </span>
-      </div>
-      <% } %>
     </div>
     <div class="footer">
       <h2 class="author">
