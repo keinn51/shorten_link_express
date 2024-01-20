@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname));
 
 // 미들웨어 설정
 app.use(bodyParser.urlencoded({ extended: false }));
