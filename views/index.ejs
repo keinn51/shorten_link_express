@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bada Link</title>
 
-    <% if (message) { %>
-    <script>
-      alert("<%= message %>");
-    </script>
-    <% } %>
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -123,17 +117,21 @@
           .then((data) => {
             const newLink = data.newLink;
             const formBoxNode = document.getElementById("formBox");
+            const newLinkNode = document.getElementById("newLink");
+            if (newLinkNode) {
+              newLinkNode.remove();
+            }
+
             const newNode = `
-              <div class="newLink">
+              <div id="newLink" class="newLink">
                 <span>
                   Hey! This is your new link:
-                  <a href="${newLink}">${newLink}</a>
+                  <a id="newLink" href="${newLink}">${newLink}</a>
                 </span>
               </div>
             `;
             formBoxNode.insertAdjacentHTML("afterend", newNode);
-          })
-          .catch((error) => {});
+          });
       }
     </script>
   </head>

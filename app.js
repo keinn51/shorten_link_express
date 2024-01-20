@@ -90,6 +90,7 @@ app.post("/", async (req, res) => {
     (error, results) => {
       if (error) {
         console.error(error);
+        res.status(500).send("내부 서버 오류");
         return;
       }
 
