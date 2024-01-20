@@ -113,7 +113,12 @@
             "Content-Type": "application/json", // 타입 반드시 지정해줘야함..
           },
         })
-          .then((response) => response.json())
+          .then((response) => {
+            if (response.ok === false) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+          })
           .then((data) => {
             const newLink = data.newLink;
             const formBoxNode = document.getElementById("formBox");
@@ -126,11 +131,14 @@
               <div id="newLink" class="newLink">
                 <span>
                   Hey! This is your new link:
-                  <a id="newLink" href="${newLink}">${newLink}</a>
+                  <a id="newLink" href="${newLink}" target="_blank">${newLink}</a>
                 </span>
               </div>
             `;
             formBoxNode.insertAdjacentHTML("afterend", newNode);
+          })
+          .catch((errorMessage) => {
+            alert(errorMessage);
           });
       }
     </script>
@@ -153,7 +161,7 @@
             type="text"
             required
           />
-          <button type="submit" class="submit-button">줄이기!</button>
+          <button type="submit" class="submit-button">Shorten!</button>
         </form>
       </div>
     </div>

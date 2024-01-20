@@ -54,9 +54,16 @@ function getOriginalLink(newEndPoint) {
   });
 }
 
+function addProtocolToURL(url) {
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    url = "https://" + url;
+  }
+  return url;
+}
+
 // 루트 경로에 대한 핸들러
 app.get("/", (req, res) => {
-  res.render("index.ejs", { message: null });
+  res.render("index.ejs");
 });
 
 // 서버 시작
@@ -67,7 +74,7 @@ app.listen(port, () => {
 // submit시 실행 함수
 app.post("/", async (req, res) => {
   console.log(req.body, req.body.originalLink);
-  const originalLink = req.body.originalLink;
+  let originalLink = req.body.originalLink;
   let newEndPoint = generateRandomId(6);
 
   try {
@@ -78,11 +85,11 @@ app.post("/", async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.render("index.ejs", {
-      message: "서버에서 오류가 발생했습니다. 죄송합니다.",
-    });
+    res.status(500).send("");
     return;
   }
+
+  originalLink = addProtocolToURL(originalLink);
 
   connection.query(
     "INSERT INTO shortenlink.link (originalLink, newEndPoint) VALUES (?, ?)",
@@ -90,13 +97,12 @@ app.post("/", async (req, res) => {
     (error, results) => {
       if (error) {
         console.error(error);
-        res.status(500).send("내부 서버 오류");
+        res.status(500).send();
         return;
       }
 
       const newLink =
         req.protocol + "://" + req.get("host") + req.originalUrl + newEndPoint;
-      console.log("현재 주소:", newLink);
 
       res.send({ newLink });
     }
