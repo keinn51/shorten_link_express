@@ -78,6 +78,19 @@
         color: snow;
       }
 
+      .newLink {
+        margin-top: 20px;
+        span {
+          font-weight: bold;
+          font-family: "Noto Sans", sans-serif;
+          font-size: 16px;
+          color: snow;
+        }
+        a {
+          color: lightblue;
+        }
+      }
+
       .title,
       .author {
         font-family: "Noto Sans", sans-serif;
@@ -111,9 +124,11 @@
       </div>
 
       <% if (newLink) { %>
-      <div>
-        Hey! This is your new link:
-        <a href="<%= newLink %>"><%= newLink %></a>
+      <div class="newLink">
+        <span>
+          Hey! This is your new link:
+          <a href="<%= newLink %>"><%= newLink %></a>
+        </span>
       </div>
       <% } %>
     </div>
