@@ -35,10 +35,10 @@ function generateRandomId(length) {
   return result;
 }
 
-function getOriginalLink(newLink) {
+function getOriginalLink(newEndPoint) {
   return new Promise((resolve, reject) => {
     connection.query(
-      `SELECT * FROM shortenlink.link WHERE newLink='${newLink}' LIMIT 1`,
+      `SELECT * FROM shortenlink.link WHERE newEndPoint='${newEndPoint}' LIMIT 1`,
       (error, results) => {
         if (error) {
           reject(error);
@@ -56,7 +56,7 @@ function getOriginalLink(newLink) {
 
 // 루트 경로에 대한 핸들러
 app.get("/", (req, res) => {
-  res.render("index.ejs", { message: "" });
+  res.render("index.ejs", { message: null, newEndPoint: null });
 });
 
 // 서버 시작
@@ -67,45 +67,50 @@ app.listen(port, () => {
 // submit시 실행 함수
 app.post("/", async (req, res) => {
   const originalLink = req.body.originalLink;
-  let newLink = generateRandomId(6);
+  let newEndPoint = generateRandomId(6);
 
   try {
-    let preExistingNewLink = await getOriginalLink(newLink);
-    while (preExistingNewLink !== null) {
-      newLink = generateRandomId(6);
-      preExistingNewLink = await getOriginalLink(newLink);
+    let preExistingnewEndPoint = await getOriginalLink(newEndPoint);
+    while (preExistingnewEndPoint !== null) {
+      newEndPoint = generateRandomId(6);
+      preExistingnewEndPoint = await getOriginalLink(newEndPoint);
     }
   } catch (err) {
     console.error(err);
     res.render("index.ejs", {
       message: "서버에서 오류가 발생했습니다. 죄송합니다.",
+      newEndPoint: null,
     });
     return;
   }
 
   connection.query(
-    "INSERT INTO shortenlink.link (originalLink, newLink) VALUES (?, ?)",
-    [originalLink, newLink],
+    "INSERT INTO shortenlink.link (originalLink, newEndPoint) VALUES (?, ?)",
+    [originalLink, newEndPoint],
     (error, results) => {
       if (error) {
         console.error(error);
         return;
       }
-      res.send("쿼리문이 실행되었습니다.");
+
+      res.render("index.ejs", {
+        message: null,
+        newEndPoint,
+      });
     }
   );
 });
 
 // 리다이렉트
-app.get("/:newLink", async (req, res) => {
-  const newLink = req.params.newLink;
+app.get("/:newEndPoint", async (req, res) => {
+  const newEndPoint = req.params.newEndPoint;
 
-  if (newLink === "404.ejs") {
+  if (newEndPoint === "404.ejs") {
     return;
   }
 
   try {
-    const originalLink = await getOriginalLink(newLink);
+    const originalLink = await getOriginalLink(newEndPoint);
 
     if (originalLink === null) {
       res.render("404.ejs");

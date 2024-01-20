@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bada Link</title>
+
     <% if (message) { %>
     <script>
       alert("<%= message %>");
@@ -108,6 +109,14 @@
           <button type="submit" class="submit-button">줄이기!</button>
         </form>
       </div>
+
+      <% if (newEndPoint) { %>
+      <div>
+        Hey! This is your new link:
+        <a href="<%= newEndPoint %>"><%= newEndPoint %></a>
+      </div>
+      <% } %>
+      <!--  -->
     </div>
     <div class="footer">
       <h2 class="author">
