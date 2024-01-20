@@ -22,13 +22,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-function getAllLinks(callback) {
-  connection.query(`SELECT * FROM shortenlink.link;`, (err, rows, fields) => {
-    if (err) throw err;
-    callback(rows);
-  });
-}
-
 function generateRandomId(length) {
   let result = "";
   const characters =
@@ -63,4 +56,17 @@ app.post("/", (req, res) => {
     if (error) throw error;
     res.send("쿼리문이 실행되었습니다.");
   });
+});
+
+// 리다이렉트
+app.get("/:newLink", (req, res) => {
+  const newLink = req.params.newLink;
+  connection.query(
+    `SELECT * FROM shortenlink.link WHERE newLink='${newLink}' LIMIT 1`,
+    (err, rows, fields) => {
+      if (err) throw err;
+      // console.log(rows[0].originalLink);
+      res.redirect(rows[0].originalLink); // /old-url로 접속 시 /new-url로 리다이렉트
+    }
+  );
 });
