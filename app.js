@@ -56,7 +56,7 @@ function getOriginalLink(newEndPoint) {
 
 // 루트 경로에 대한 핸들러
 app.get("/", (req, res) => {
-  res.render("index.ejs", { message: null, newEndPoint: null });
+  res.render("index.ejs", { message: null, newLink: null });
 });
 
 // 서버 시작
@@ -79,7 +79,7 @@ app.post("/", async (req, res) => {
     console.error(err);
     res.render("index.ejs", {
       message: "서버에서 오류가 발생했습니다. 죄송합니다.",
-      newEndPoint: null,
+      newLink: null,
     });
     return;
   }
@@ -93,9 +93,13 @@ app.post("/", async (req, res) => {
         return;
       }
 
+      const newLink =
+        req.protocol + "://" + req.get("host") + req.originalUrl + newEndPoint;
+      console.log("현재 주소:", newLink);
+
       res.render("index.ejs", {
         message: null,
-        newEndPoint,
+        newLink,
       });
     }
   );
