@@ -4,6 +4,7 @@ const port = 3000;
 require("dotenv").config();
 const mysql = require("mysql");
 const path = require("path");
+const bodyParser = require("body-parser");
 
 const connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -17,11 +18,28 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
+// 미들웨어 설정
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 function getAllLinks(callback) {
   connection.query(`SELECT * FROM shortenlink.link;`, (err, rows, fields) => {
     if (err) throw err;
     callback(rows);
   });
+}
+
+function generateRandomId(length) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 }
 
 // 루트 경로에 대한 핸들러
@@ -35,8 +53,14 @@ app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
 
-app.get("/test", function (req, res, next) {
-  getAllLinks((rows) => {
-    console.log(rows);
+// submit시 실행 함수
+app.post("/", (req, res) => {
+  const originalLink = req.body.originalLink;
+  const newLink = generateRandomId(6);
+  const query =
+    "INSERT INTO shortenlink.link (originalLink, newLink) VALUES (?, ?)";
+  connection.query(query, [originalLink, newLink], (error, results) => {
+    if (error) throw error;
+    res.send("쿼리문이 실행되었습니다.");
   });
 });
