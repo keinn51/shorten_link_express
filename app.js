@@ -68,8 +68,7 @@ app.post("/", async (req, res) => {
         return;
       }
 
-      const newLink =
-        req.protocol + "://" + req.get("host") + req.originalUrl + newEndPoint;
+      const newLink = process.env.PROD_URL + "\\" + newEndPoint;
 
       res.send({ newLink });
     }
