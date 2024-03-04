@@ -68,7 +68,7 @@ app.post("/", async (req, res) => {
         return;
       }
 
-      const newLink = process.env.PROD_URL + "\\" + newEndPoint;
+      const newLink = process.env.PROD_URL + "/" + newEndPoint;
 
       res.send({ newLink });
     }
