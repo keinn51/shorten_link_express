@@ -1,6 +1,6 @@
-## express + ejs 를 이용해 링크 단축 사이트 만들기
+## express + ejs, 링크를 단축 시켜주는 사이트
 
-http://kyungsle.kro.kr:5002/
+https://kyungsle.kro.kr:7002/
 
 <img width="1014" alt="image" src="https://github.com/keinn51/shorten_link_express/assets/79993356/7fc7b558-ca64-4ca1-aa9b-c63d0aaef888">
 
@@ -13,11 +13,6 @@ http://kyungsle.kro.kr:5002/
 - express와 ejs를 이용하여 화면을 구성했습니다.
 - 모든 링크들은 MYSQL을 이용해 구축한 데이터베이스에 저장됩니다.
 
-### 개발 예정 (24.01.21 기준)
-- https를 적용해야 합니다.
+### 개발 예정 (24.03.05 기준)
 - 반응형 작업을 해야합니다.
-
-### 노트
-홈서버는 80 포트가 열리지 않아서.. 도메인의 포트 번호를 지울 수가 없게 되었습니다😂
-
-포트 번호는 그대로 붙여두어야 하는 걸까요😥
+- 포트 붙어 있는 도메인이 아닌 새로운 도메인을 사용해야 하지 않을까요??
